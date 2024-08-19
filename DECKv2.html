@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Deck - Myles Davis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #bbbbbb;
+        }
+
+        .card-deck {
+            position: relative;
+            width: 400px; /* Width of the deck */
+            height: 260px; /* Height of the deck */
+        }
+
+        .card {
+            width: 337px; /* Width based on ratio 3.370:2.125 */
+            height: 225px; /* Height based on ratio 3.370:2.125 */
+            position: absolute;
+            text-align: center;
+            transition: transform 0.6s, z-index 0.4s, background-color 0.4s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            backface-visibility: hidden;
+            z-index: 1; /* Default z-index for cards */
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            overflow: hidden; /* Ensure the image fits within the card */
+        }
+
+        .card-front img, .card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure the image covers the entire card */
+        }
+
+        .card-front {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            color: #fff;
+            position: relative;
+        }
+
+        .card-back .card-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2; /* Ensure text is above the image */
+            color: white; /* Text color */
+        }
+
+        /* Card colors and back colors */
+        .card:nth-child(1) .card-front {
+            background-color: #FFB3B3; /* Pastel red */
+        }
+        .card:nth-child(1) .card-back {
+            background-color: #FF6F6F; /* Darker pastel red */
+        }
+
+        .card:nth-child(2) .card-front {
+            background-color: #B3FFB3; /* Pastel green */
+        }
+        .card:nth-child(2) .card-back {
+            background-color: #6FFF6F; /* Darker pastel green */
+        }
+
+        .card:nth-child(3) .card-front {
+            background-color: #B3B3FF; /* Pastel blue */
+        }
+        .card:nth-child(3) .card-back {
+            background-color: #6F6FFF; /* Darker pastel blue */
+        }
+
+        .card:nth-child(4) .card-front {
+            background-color: #F5F5B3; /* Pastel yellow */
+        }
+        .card:nth-child(4) .card-back {
+            background-color: #F3F03F; /* Darker pastel yellow */
+        }
+
+        /* Positioning non-active cards with more spread out */
+        .card:nth-child(1) {
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+
+        .card:nth-child(2) {
+            top: 30%;
+            left: 40%;
+            transform: translate(-50%, -50%) rotate(10deg);
+        }
+
+        .card:nth-child(3) {
+            top: 70%;
+            left: 60%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+        }
+
+        .card:nth-child(4) {
+            top: 60%;
+            left: 30%;
+            transform: translate(-50%, -50%) rotate(5deg);
+        }
+
+        .card.active {
+            z-index: 2; /* Ensure the active card is on top */
+            transform: translate(-50%, -50%) scale(1.1);
+            top: 50%;
+            left: 50%;
+        }
+
+        .card.flipped .card-front {
+            transform: rotateY(180deg);
+        }
+
+        .card.flipped .card-back {
+            transform: rotateY(0);
+        }
+
+        h1, p {
+            margin: 0;
+        }
+
+        p {
+            font-size: 1em;
+            color: #000;
+        }
+        
+        p1 {
+            font-size: 1.5em;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-deck">
+        <div class="card" onclick="toggleCard(this)">
+            <div class="card-front">
+                <img src="https://my1es.s3.us-east-2.amazonaws.com/CARD1front.jpg" alt="Front Image"> <!-- Replace with your S3 image URL -->
+            </div>
+            <div class="card-back">
+                <img src="https://my1es.s3.us-east-2.amazonaws.com/CARD1back.jpg" alt="Back Image"> <!-- Replace with your S3 image URL -->
+                <div class="card-content">
+                    <p1>(509) 407-7551</p1>
+                    <p>mylesrhinehartdavis@gmail.com</p>
+                </div>
+            </div>
+        </div>
+        <div class="card" onclick="toggleCard(this)">
+            <div class="card-front">
+                <img src="https://my1es.s3.us-east-2.amazonaws.com/ABOUTME.jpg" alt="Card 2 Image">
+            </div>
+            <div class="card-back">
+                <p>Back Side</p>
+            </div>
+        </div>
+        <div class="card" onclick="toggleCard(this)">
+            <div class="card-front">
+                <p>Card 3 Front Side</p>
+            </div>
+            <div class="card-back">
+                <p>Back Side</p>
+            </div>
+        </div>
+        <div class="card" onclick="toggleCard(this)">
+            <div class="card-front">
+                <p>Card 4 Front Side</p>
+            </div>
+            <div class="card-back">
+                <p>Back Side</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bringToFront(card) {
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(c => {
+                c.classList.remove('active');
+                c.style.zIndex = '1'; // Ensure all cards have the default z-index
+            });
+
+            // Set the clicked card as active
+            card.classList.add('active');
+            card.style.zIndex = '2'; // Bring the active card to the front
+        }
+
+        function toggleCard(card) {
+            if (card.classList.contains('active')) {
+                card.classList.toggle('flipped');
+            } else {
+                bringToFront(card);
+            }
+        }
+
+        // Set card 1 as active on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstCard = document.querySelector('.card:nth-child(1)');
+            bringToFront(firstCard);
+        });
+    </script>
+</body>
+</html>
