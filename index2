@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Effect</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 2em;
+            white-space: pre; /* Preserve spaces and new lines */
+            transition: background-color 0.5s ease; /* Transition for fading effect */
+        }
+
+        .cursor {
+            border-right: 2px solid white; /* Cursor */
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            50% {
+                border-color: transparent; /* Blinking effect */
+            }
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="typedText"></div>
+<span class="cursor"></span>
+
+<script>
+    const text = `hi I'm Myles
+the sun is happy to shine on you
+here's how you can contact me:
+509-407-7551
+mylesrhinehartdavis@gmail.com
+if you want to see more of who I am`;
+
+    const typingSpeed = 100; // Time between each letter
+    const diveIntoMyMind = "dive into my mind";
+    const newText = "my mind is blank, refresh?"; // New text to display after fade
+    let index = 0;
+    const typedTextElement = document.getElementById('typedText');
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function typeEffect() {
+        if (index < text.length) {
+            const currentChar = text.charAt(index);
+            typedTextElement.innerHTML += currentChar; // Add one character at a time
+            index++;
+
+            // Check if we reach the end of the main text
+            if (index === text.length) {
+                setTimeout(() => typeClickablePhrase(), typingSpeed * 2); // Wait before typing the clickable phrase
+            } else {
+                setTimeout(typeEffect, typingSpeed);
+            }
+        }
+    }
+
+    function typeClickablePhrase() {
+        let phraseIndex = 0;
+        typedTextElement.innerHTML += "\n"; // Add a new line before typing the clickable phrase
+
+        function typeLetter() {
+            if (phraseIndex < diveIntoMyMind.length) {
+                const letter = diveIntoMyMind.charAt(phraseIndex);
+                const letterSpan = document.createElement('span');
+                letterSpan.style.color = getRandomColor(); // Random color for each letter
+                letterSpan.textContent = letter;
+                typedTextElement.appendChild(letterSpan);
+                phraseIndex++;
+                setTimeout(typeLetter, typingSpeed); // Continue typing the next letter
+            } else {
+                // Make the entire phrase clickable after typing is done
+                makeClickable();
+            }
+        }
+
+        typeLetter(); // Start typing the clickable phrase
+    }
+
+    function makeClickable() {
+        const spans = typedTextElement.querySelectorAll('span');
+        spans.forEach(span => {
+            span.classList.add('clickable');
+            span.addEventListener('click', () => {
+                fadeToWhite(); // Fade the screen to white on click
+            });
+        });
+    }
+
+    function fadeToWhite() {
+        document.body.style.backgroundColor = 'white'; // Change background color to white
+        //typedTextElement.style.color = 'black'; // Change text color to black for contrast
+
+        // Clear the text and type new text after fading
+        setTimeout(() => {
+            typedTextElement.innerHTML = ''; // Clear the text after fading
+            typedTextElement.style.color = 'black';
+            typeNewText(); // Start typing the new text
+        }, 1500); // Time should match the transition duration
+    }
+
+    function typeNewText() {
+        let newIndex = 0;
+
+        function typeNewLetter() {
+            if (newIndex < newText.length) {
+                typedTextElement.innerHTML += newText.charAt(newIndex); // Add one character at a time
+                newIndex++;
+                setTimeout(typeNewLetter, typingSpeed); // Continue typing the next letter
+            }
+        }
+
+        typeNewLetter(); // Start typing the new text
+    }
+
+    // Start the typing effect
+    typeEffect();
+</script>
+
+</body>
+</html>
