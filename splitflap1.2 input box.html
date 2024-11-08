@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Character Display with Split-Flap Coordinates</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-size: 2rem; /* Adjusted for a 20x10 grid */
+            background-color: #222;
+            color: #ffffff;
+            font-family: monospace;
+            overflow: hidden; /* Prevent scrollbars from appearing */
+        }
+
+        #characters {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr); /* 20 columns */
+            grid-template-rows: repeat(10, 1fr);    /* 10 rows */
+            gap: 2px; /* Spacing between characters */
+            margin-top: 20px;
+        }
+
+        .character {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            animation: blink 0.5s step-end infinite;
+        }
+
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+
+        input {
+            font-size: 1.5rem;
+            padding: 10px;
+            margin: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Input box for entering text -->
+    <input type="text" id="inputText" placeholder="Enter text..." />
+
+    <!-- Create 200 character divs for a 20x10 grid -->
+    <div id="characters">
+        <!-- These divs will be populated by JavaScript -->
+    </div>
+
+    <script>
+        const characters = [
+            ..."0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        ]; // Array of available keyboard characters
+
+        const charactersContainer = document.getElementById('characters');
+        const inputText = document.getElementById('inputText');
+
+        // Array to hold split-flap elements, storing their (x, y) coordinates
+        const splitFlaps = [];
+        const resetTime = 3000; // Time (in ms) before restarting animation if not updated
+
+        // Function to create the grid of character elements
+        function createCharacterGrid() {
+            for (let y = 0; y < 10; y++) { // 10 rows
+                for (let x = 0; x < 20; x++) { // 20 columns
+                    const charElement = document.createElement('span');
+                    charElement.classList.add('character');
+                    // Store the coordinates (x, y) in the splitFlap object, along with a "manual" flag and last update time
+                    const splitFlap = { 
+                        x, 
+                        y, 
+                        element: charElement, 
+                        isManual: false, 
+                        lastUpdated: Date.now() 
+                    };
+                    splitFlaps.push(splitFlap);
+
+                    // Append the character element to the grid container
+                    charactersContainer.appendChild(charElement);
+                }
+            }
+        }
+
+        // Function to update a single character element
+        function updateCharacter(splitFlap) {
+            // If the character is manually set, skip the update
+            if (splitFlap.isManual) {
+                return;
+            }
+
+            const charIndex = Math.floor(Math.random() * characters.length);
+            splitFlap.element.textContent = characters[charIndex];
+        }
+
+        // Function to update all character elements
+        function updateAllCharacters() {
+            const currentTime = Date.now();
+            splitFlaps.forEach(splitFlap => {
+                // If it hasn't been updated for a while, reset the flag to allow animation
+                if (!splitFlap.isManual && (currentTime - splitFlap.lastUpdated) > resetTime) {
+                    splitFlap.isManual = false; // Allow the animation to take over again
+                }
+
+                updateCharacter(splitFlap);
+            });
+        }
+
+        // Function to populate the grid with characters from input text
+        function populateGridWithText() {
+            let index = 0;
+            const text = inputText.value; // Get the text from the input box
+
+            // Iterate through the input text and push each character to the grid
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+
+                // Find the split-flap at the current position
+                const splitFlap = splitFlaps[index];
+
+                // Set the character in the split-flap's element
+                splitFlap.element.textContent = char;
+
+                // Set the flag to indicate that this character was manually set
+                splitFlap.isManual = true;
+
+                // Update the last updated timestamp
+                splitFlap.lastUpdated = Date.now();
+
+                // Move to the next position in the grid
+                index++;
+                if (index >= splitFlaps.length) {
+                    break; // Stop once all split-flaps are filled
+                }
+            }
+        }
+
+        // Initialize the character grid and store the split-flaps with coordinates
+        createCharacterGrid();
+
+        // Update all characters every 100 milliseconds (10 characters per second)
+        setInterval(updateAllCharacters, 100);
+
+        // Event listener for input box to populate grid with entered text
+        inputText.addEventListener('input', populateGridWithText);
+
+    </script>
+
+</body>
+</html>
