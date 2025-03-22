@@ -1,54 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>my1es.com</title>
-    <style>
-        body {
-            font-family: 'Noto Sans', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            position: relative;
-        }
-        .top-left {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            margin: 0;
-            text-align: left;
-            font-size: 24px;
-            font-weight: bold;
-      
-        }
-        .top-left p {
-            margin: 0 0 5px; /* Add spacing between lines for better readability */
-            line-height: 1.5;
-        }
-        .website {
-            font-size: calc(100vw / 5.75);
-            font-weight: bold;
-            margin: 0;
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            box-sizing: border-box;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>my1es.com</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+  
+  
+  
+   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: #c0c0c0;
+      height: 100vh;
+      font-family: 'Syne mono', sans-serif; /* Set to Noto font */
+      overflow: hidden;
+    }
+
+    .window {
+      width: 700px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 3px solid #000;
+      background-color: #fff;
+      box-shadow: 6px 6px 0 #000;
+      z-index: 10;
+      resize: both;  /* Enable resizing */
+      overflow: auto;  /* Allow scrolling if content exceeds size */
+    }
+
+    .title-bar {
+      background-color: #000080;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0;
+      cursor: move;
+      user-select: none;
+      height: 28px;
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+      padding: 0 10px;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 2px;
+      padding: 0 6px;
+    }
+
+    .tab {
+      padding: 2px 10px;
+      font-size: 14px;
+      background-color: #000080;
+      color: white;
+      cursor: pointer;
+      height: 24px;
+      line-height: 20px;
+    }
+
+    .tab.active {
+      background-color: #c0c0c0;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .controls {
+      display: flex;
+      gap: 4px;
+      padding: 0 8px;
+    }
+
+    .title-bar button {
+      width: 16px;
+      height: 16px;
+      background-color: silver;
+      border: 1px solid #000;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 12px;
+      padding: 0;
+    }
+
+    .content {
+      display: none;
+      padding: 16px;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="top-left">
-        <p class="email">mylesrhinehartdavis@gmail.com</p>
-        <p class="phone">509-407-7551</p>
+
+  <div class="window" id="retroWindow">
+    <div class="title-bar" id="titleBar">
+      <div class="title-left">
+        <div class="title">my1es.com</div>
+        <div class="tab-bar">
+          <div class="tab active" data-tab="home">Home</div>
+          <div class="tab" data-tab="about">About</div>
+          <div class="tab" data-tab="projects">Projects</div>
+          <div class="tab" data-tab="contact">Contact</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button>-</button>
+        <button>x</button>
+      </div>
     </div>
-    <p class="website">my1es.com</p>
+
+    <div class="content active" id="home">
+      <h1>Welcome</h1>
+      <p>This is your retro tabbed window. Click the tabs above to switch views.</p>
+    </div>
+    <div class="content" id="about">
+      <h1>About</h1>
+      <p>This project is inspired by classic OS interfaces like Windows 95 and early Linux GUIs.</p>
+    </div>
+    <div class="content" id="projects">
+      <h1>Projects</h1>
+      <p>Here you could list code projects, creative experiments, or anything you're proud of.</p>
+    </div>
+    <div class="content" id="contact">
+      <h1>Contact</h1>
+      <p>Email: <strong>yourname@example.com</strong></p>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        contents.forEach(c => {
+          c.classList.remove('active');
+          if (c.id === target) c.classList.add('active');
+        });
+      });
+    });
+
+    // Draggable window
+    const windowEl = document.getElementById('retroWindow');
+    const titleBar = document.getElementById('titleBar');
+    let isDragging = false, offsetX = 0, offsetY = 0;
+
+    titleBar.addEventListener('mousedown', e => {
+      isDragging = true;
+      const rect = windowEl.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (isDragging) {
+        windowEl.style.left = `${e.clientX - offsetX}px`;
+        windowEl.style.top = `${e.clientY - offsetY}px`;
+        windowEl.style.transform = `none`; // disable center transform when dragging
+      }
+    });
+  </script>
+
 </body>
 </html>
