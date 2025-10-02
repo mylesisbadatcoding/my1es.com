@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Zoom Pages</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: none; /* disable default pinch-to-zoom */
+    }
+    .page {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      color: rgba(0, 0, 0, 1);
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      box-sizing: border-box;
+      font-size: 2rem;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+    }
+    .page-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+    }
+    .page-content img {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .page-content h1, .page-content h2, .page-content p, .page-content a {
+      margin: 10px 0;
+      color: inherit;
+      text-decoration: none;
+    }
+    .info-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="page1">
+    <div class="page-content">
+      <h1>my1es.com</h1>
+      <p>zoom in to continue</p>
+    </div>
+  </div>
+  <div class="page" id="page2">
+    <div class="page-content">
+      <img src="https://science.nasa.gov/wp-content/uploads/2023/06/webb-flickr-52259221868-30e1c78f0c-4k-jpg.webp" alt="A picture of me">
+      <h2>hi, i'm myles</h2>
+      <p>Thanks for visiting my little slice of the internet. I made this page because its cooler than a buisiness card and I have a chronic hyperfixation issue. 
+        Some of those other fixations include skiing, rafting, climbing, wrenching on cars, and building my house. You're here because I want to connect with you, keep zooming to find out how!</p>
+    </div>
+  </div>
+  <div class="page" id="page3">
+    <div class="page-content">
+      <h2>reach out</h2>
+      <p><a href="mailto:mylesrhinehartdavis@gmail.com">mylesrhinehartdavis@gmail.com</a></p>
+      <p>509-407-7551</p>
+    </div>
+  </div>
+
+  <div class="info-panel" id="info"></div>
+
+  <script>
+    const pages = [
+      { el: document.getElementById("page1"), scale: 1.0 },
+      { el: document.getElementById("page2"), scale: 0 },
+      { el: document.getElementById("page3"), scale: -1.0 }
+    ];
+
+    let zoomLevel = 0;
+    let snapTimeout;
+    let lastTouchDistance = null;
+    let lastDirection = 0;
+
+    const MIN_ZOOM = -0.15;
+    const MAX_ZOOM = 2.15;
+
+    const infoPanel = document.getElementById("info");
+
+    function updatePages() {
+      let infoText = `Zoom Level: ${zoomLevel.toFixed(2)}<br>`;
+      pages.forEach((pg, i) => {
+        let opacity;
+        if (pg.scale <= 1) {
+          opacity = pg.scale;
+        } else {
+          opacity = Math.max(0, 2 - pg.scale);
+        }
+
+        pg.el.style.transform = `translate(-50%, -50%) scale(${pg.scale})`;
+        pg.el.style.opacity = opacity;
+        pg.el.style.color = `rgba(0, 0, 0, ${opacity})`;
+
+        infoText += `Page ${i+1}: scale=${pg.scale.toFixed(2)}, opacity=${opacity.toFixed(2)}<br>`;
+      });
+      infoPanel.innerHTML = infoText;
+    }
+
+    function adjustZoom(delta, direction) {
+      lastDirection = direction;
+      if (direction > 0) {
+        if (zoomLevel + delta <= MAX_ZOOM) {
+          pages.forEach(pg => pg.scale += delta);
+          zoomLevel += delta;
+        }
+      } else {
+        if (zoomLevel - delta >= MIN_ZOOM) {
+          pages.forEach(pg => pg.scale -= delta);
+          zoomLevel -= delta;
+        }
+      }
+      updatePages();
+
+      clearTimeout(snapTimeout);
+      snapTimeout = setTimeout(() => {
+        const nearest = Math.round(zoomLevel);
+        const distance = Math.abs(zoomLevel - nearest);
+
+        let target;
+        if (distance < 0.25) { // loosen snap threshold
+          target = nearest;
+        } else {
+          target = lastDirection > 0 ? Math.ceil(zoomLevel) : Math.floor(zoomLevel);
+        }
+
+        target = Math.min(Math.max(target, MIN_ZOOM), MAX_ZOOM);
+
+        const diff = target - zoomLevel;
+        zoomLevel = target;
+        pages.forEach(pg => pg.scale += diff);
+        updatePages();
+      }, 300); // loosen snap delay
+    }
+
+    window.addEventListener("wheel", (e) => {
+      let direction = e.deltaY < 0 ? 1 : -1;
+      adjustZoom(0.05, direction);
+    });
+
+    // Pinch-to-zoom support
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (lastTouchDistance) {
+          const deltaDist = distance - lastTouchDistance;
+          if (Math.abs(deltaDist) > 10) { // looser sensitivity threshold
+            let direction = deltaDist > 0 ? 1 : -1;
+            adjustZoom(0.03, direction);
+          }
+        }
+        lastTouchDistance = distance;
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      lastTouchDistance = null;
+    });
+
+    updatePages();
+  </script>
+</body>
+</html>
