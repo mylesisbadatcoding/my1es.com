@@ -61,6 +61,10 @@
       text-decoration: none;
       line-height: 1.4;
     }
+    .disabled-link {
+      pointer-events: none;
+      cursor: default;
+    }
   </style>
 </head>
 <body>
@@ -80,8 +84,8 @@
   <div class="page" id="page3">
     <div class="page-content">
       <h2>reach out</h2>
-      <p><a href="mailto:mylesrhinehartdavis@gmail.com">mylesrhinehartdavis@gmail.com</a></p>
-      <p>509-407-7551</p>
+      <p><a id="email-link" class="disabled-link" href="mailto:mylesrhinehartdavis@gmail.com">mylesrhinehartdavis@gmail.com</a></p>
+      <p><a id="phone-link" class="disabled-link" href="tel:5094077551">509-407-7551</a></p>
     </div>
   </div>
 
@@ -100,6 +104,9 @@
     const MIN_ZOOM = -0.15;
     const MAX_ZOOM = 2.15;
 
+    const emailLink = document.getElementById("email-link");
+    const phoneLink = document.getElementById("phone-link");
+
     function updatePages() {
       pages.forEach((pg, i) => {
         let opacity;
@@ -113,6 +120,15 @@
         pg.el.style.opacity = opacity;
         pg.el.style.color = `rgba(0, 0, 0, ${opacity})`;
       });
+
+      // Enable links only when page3 is fully visible (zoomLevel === -1)
+      if (Math.round(zoomLevel) === -1) {
+        emailLink.classList.remove("disabled-link");
+        phoneLink.classList.remove("disabled-link");
+      } else {
+        emailLink.classList.add("disabled-link");
+        phoneLink.classList.add("disabled-link");
+      }
     }
 
     function adjustZoom(delta, direction) {
@@ -184,5 +200,6 @@
     updatePages();
   </script>
 </body>
+</html>
 </html>
 
