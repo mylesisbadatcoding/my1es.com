@@ -26,7 +26,7 @@
       font-family: Arial, sans-serif;
       padding: 20px;
       box-sizing: border-box;
-      font-size: 2rem;
+      font-size: clamp(1rem, 4vw, 2rem);
       width: 100%;
       max-width: 800px;
       text-align: center;
@@ -41,26 +41,25 @@
     }
     .page-content img {
       width: 100%;
-      max-width: 700px;
+      max-width: 90vw;
       height: auto;
       border-radius: 10px;
       margin-bottom: 20px;
     }
-    .page-content h1, .page-content h2, .page-content p, .page-content a {
+    .page-content h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      margin: 10px 0;
+    }
+    .page-content h2 {
+      font-size: clamp(1.5rem, 6vw, 3rem);
+      margin: 10px 0;
+    }
+    .page-content p, .page-content a {
+      font-size: clamp(1rem, 4vw, 1.5rem);
       margin: 10px 0;
       color: inherit;
       text-decoration: none;
-    }
-    .info-panel {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 0.9rem;
-      border-radius: 5px;
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -75,8 +74,7 @@
     <div class="page-content">
       <img src="IMG_0886 (2).jpeg" alt="A picture of me">
       <h2>hi, i'm myles</h2>
-      <p>Thanks for visiting my little slice of the internet. I made this page because its cooler than a buisiness card and I have a chronic hyperfixation issue. 
-        Some of those other fixations include skiing, rafting, climbing, wrenching on cars, and building my house. You're here because I want to connect with you, keep zooming to find out how!</p>
+      <p>Thanks for visiting my little slice of the internet. honestly idk what to write here so for now i guess just keep zooming.</p>
     </div>
   </div>
   <div class="page" id="page3">
@@ -86,8 +84,6 @@
       <p>509-407-7551</p>
     </div>
   </div>
-
-  <div class="info-panel" id="info"></div>
 
   <script>
     const pages = [
@@ -104,10 +100,7 @@
     const MIN_ZOOM = -0.15;
     const MAX_ZOOM = 2.15;
 
-    const infoPanel = document.getElementById("info");
-
     function updatePages() {
-      let infoText = `Zoom Level: ${zoomLevel.toFixed(2)}<br>`;
       pages.forEach((pg, i) => {
         let opacity;
         if (pg.scale <= 1) {
@@ -119,10 +112,7 @@
         pg.el.style.transform = `translate(-50%, -50%) scale(${pg.scale})`;
         pg.el.style.opacity = opacity;
         pg.el.style.color = `rgba(0, 0, 0, ${opacity})`;
-
-        infoText += `Page ${i+1}: scale=${pg.scale.toFixed(2)}, opacity=${opacity.toFixed(2)}<br>`;
       });
-      infoPanel.innerHTML = infoText;
     }
 
     function adjustZoom(delta, direction) {
@@ -195,3 +185,4 @@
   </script>
 </body>
 </html>
+
