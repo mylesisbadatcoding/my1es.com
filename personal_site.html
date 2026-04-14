@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>my1es.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: #f9f9f9;
+    color: #111;
+    min-height: 100vh;
+    padding: 40px 48px;
+  }
+
+  /* ── Search bar ── */
+  .search-wrap {
+    position: relative;
+    width: 480px;
+  }
+
+  .search-box {
+    width: 100%;
+    font-family: 'Sora', sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: #111;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid rgba(0,0,0,.15);
+    border-radius: 0;
+    padding: 10px 0;
+    outline: none;
+    caret-color: #111;
+    transition: border-color .2s;
+  }
+  .search-box:focus { border-color: rgba(0,0,0,.4); }
+
+  .placeholder-hint {
+    position: absolute;
+    top: 50%; left: 0;
+    transform: translateY(-50%);
+    font-family: 'Sora', sans-serif;
+    font-size: 26px;
+    font-weight: 300;
+    color: rgba(0,0,0,.28);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .4s;
+    white-space: nowrap;
+  }
+
+  /* ── Dropdown ── */
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 100%;
+    background: transparent;
+    display: none;
+    z-index: 100;
+  }
+  .dropdown.visible { display: block; }
+
+  .dd-item {
+    padding: 9px 0;
+    font-size: 20px;
+    font-weight: 300;
+    cursor: pointer;
+    color: rgba(0,0,0,.45);
+    border-bottom: 1px solid rgba(0,0,0,.07);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    transition: color .15s;
+  }
+  .dd-item:hover { color: #111; }
+  .dd-item span.hint {
+    font-size: 12px;
+    color: rgba(0,0,0,.25);
+    font-weight: 400;
+  }
+
+  /* ── Layout ── */
+  .page { display: none; animation: fadeIn .3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── Right-aligned content ── */
+  .content-right {
+    position: fixed;
+    right: 48px;
+    top: 40px;
+    width: 420px;
+    text-align: left;
+  }
+
+  /* ── Contact ── */
+  .page-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.3);
+    margin-bottom: 24px;
+  }
+  .contact-links { display: flex; flex-direction: column; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    text-decoration: none;
+    color: #111;
+    font-size: 14px;
+    transition: opacity .2s;
+  }
+  .contact-link:hover { opacity: .4; }
+  .contact-link .icon {
+    width: 30px; height: 30px;
+    background: rgba(0,0,0,.05);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .contact-link .meta { display: flex; flex-direction: column; gap: 2px; }
+  .contact-link .meta-title { font-weight: 500; font-size: 13px; }
+  .contact-link .meta-sub { font-size: 11px; color: rgba(0,0,0,.35); }
+  .contact-link .arrow { margin-left: auto; color: rgba(0,0,0,.2); font-size: 12px; }
+
+  /* ── About ── */
+  .about-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: rgba(0,0,0,.05);
+    border-radius: 12px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0,0,0,.2);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .about-name {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .about-role {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.3);
+    margin-bottom: 18px;
+  }
+  .about-bio {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: rgba(0,0,0,.6);
+    margin-bottom: 20px;
+  }
+  .about-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid rgba(0,0,0,.08);
+    padding-top: 18px;
+  }
+  .about-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .about-row .k { color: rgba(0,0,0,.3); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+  .about-row .v { color: #111; font-weight: 400; }
+
+  /* ── 404 ── */
+  .not-found {
+    font-size: 13px;
+    color: rgba(0,0,0,.35);
+    padding-top: 80px;
+  }
+  .not-found strong { color: #111; }
+</style>
+</head>
+<body>
+
+<div class="search-wrap">
+  <input class="search-box" id="searchBox" type="text" autocomplete="off" spellcheck="false" />
+  <span class="placeholder-hint" id="hint">what are you looking for?</span>
+  <div class="dropdown" id="dropdown">
+    <div class="dd-item" data-page="contact">contact <span class="hint">get in touch</span></div>
+    <div class="dd-item" data-page="about">about <span class="hint">who I am</span></div>
+    <div class="dd-item" data-page="buildlog">build log <span class="hint">coming soon</span></div>
+  </div>
+</div>
+
+<!-- HOME (blank) -->
+<div class="page active" id="page-home"></div>
+
+<!-- CONTACT -->
+<div class="page" id="page-contact">
+  <div class="content-right">
+    <p class="page-label">Contact</p>
+    <div class="contact-links">
+      <a class="contact-link" href="mailto:hello@my1es.com">
+        <div class="icon">✉</div>
+        <div class="meta"><span class="meta-title">Email</span><span class="meta-sub">hello@my1es.com</span></div>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="contact-link" href="https://twitter.com" target="_blank">
+        <div class="icon">𝕏</div>
+        <div class="meta"><span class="meta-title">Twitter / X</span><span class="meta-sub">@my1es</span></div>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="contact-link" href="https://github.com" target="_blank">
+        <div class="icon">⌥</div>
+        <div class="meta"><span class="meta-title">GitHub</span><span class="meta-sub">github.com/my1es</span></div>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="contact-link" href="https://linkedin.com" target="_blank">
+        <div class="icon">in</div>
+        <div class="meta"><span class="meta-title">LinkedIn</span><span class="meta-sub">linkedin.com/in/my1es</span></div>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="content-right">
+    <div class="about-photo">photo</div>
+    <p class="about-name">Miles</p>
+    <p class="about-role">Designer &amp; Builder</p>
+    <p class="about-bio">
+      I'm a designer and developer based in the Pacific Northwest. I care a lot about how things feel — the small interactions, the quiet details that make a product memorable. I've spent the last several years working at the intersection of design and code, building interfaces that are as considered as they are functional.
+    </p>
+    <p class="about-bio">
+      When I'm not in front of a screen, I'm usually outside — hiking, shooting film photography, or hunting for the best coffee in town.
+    </p>
+    <div class="about-details">
+      <div class="about-row"><span class="k">Based</span><span class="v">Pacific Northwest, USA</span></div>
+      <div class="about-row"><span class="k">Focus</span><span class="v">Product Design, Web Dev</span></div>
+      <div class="about-row"><span class="k">Tools</span><span class="v">Figma, React, CSS</span></div>
+      <div class="about-row"><span class="k">Available</span><span class="v">Open to projects</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOT FOUND -->
+<div class="page" id="page-404">
+  <p class="not-found">no results for <strong id="notFoundTerm"></strong></p>
+</div>
+
+<script>
+  const box = document.getElementById('searchBox');
+  const hint = document.getElementById('hint');
+  const dropdown = document.getElementById('dropdown');
+  const ddItems = document.querySelectorAll('.dd-item');
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const t = document.getElementById('page-' + name);
+    if (t) { t.classList.add('active'); }
+    else {
+      document.getElementById('notFoundTerm').textContent = '"' + name + '"';
+      document.getElementById('page-404').classList.add('active');
+    }
+  }
+
+  function navigate(page) {
+    const labels = { home:'', contact:'contact', about:'about', buildlog:'build log' };
+    box.value = labels[page] ?? page;
+    hideDropdown();
+    hint.style.opacity = '0';
+    showPage(page);
+  }
+
+  function showDropdown(filter) {
+    let any = false;
+    ddItems.forEach(item => {
+      const match = !filter || item.dataset.page.includes(filter) || item.textContent.toLowerCase().includes(filter);
+      item.style.display = match ? '' : 'none';
+      if (match) any = true;
+    });
+    dropdown.classList.toggle('visible', any);
+  }
+  function hideDropdown() { dropdown.classList.remove('visible'); }
+
+  ddItems.forEach(item => {
+    item.addEventListener('mousedown', e => { e.preventDefault(); navigate(item.dataset.page); });
+  });
+
+  box.addEventListener('input', () => {
+    const v = box.value.trim().toLowerCase();
+    hint.style.opacity = v ? '0' : '1';
+    showDropdown(v);
+  });
+
+  box.addEventListener('focus', () => {
+    if (!box.value.trim()) hint.style.opacity = '1';
+    showDropdown(box.value.trim().toLowerCase());
+  });
+
+  box.addEventListener('blur', () => {
+    hint.style.opacity = '0';
+    setTimeout(hideDropdown, 150);
+  });
+
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const v = box.value.trim().toLowerCase();
+      const pages = ['home','contact','about','buildlog'];
+      const match = pages.find(p => p.startsWith(v));
+      navigate(match || v);
+    }
+    if (e.key === 'Escape') { box.blur(); hideDropdown(); }
+  });
+
+  // ── Intro animation ──
+  const introText = 'my1es.com';
+  let i = 0;
+  function typeIn() {
+    if (i <= introText.length) { box.value = introText.slice(0, i++); setTimeout(typeIn, 90); }
+    else setTimeout(deleteOut, 900);
+  }
+  function deleteOut() {
+    if (box.value.length > 0) { box.value = box.value.slice(0, -1); setTimeout(deleteOut, 60); }
+    else hint.style.opacity = '1';
+  }
+  setTimeout(typeIn, 600);
+</script>
+</body>
+</html>
